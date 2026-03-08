@@ -1,0 +1,6 @@
+uploads/
+brands.json
+__pycache__/
+*.pyc
+.claude/
+.DS_Store
