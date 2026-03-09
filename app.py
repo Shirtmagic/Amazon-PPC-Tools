@@ -7,6 +7,7 @@ Prerequisites: pip3 install streamlit pandas numpy openpyxl
 Run: streamlit run app.py
 """
 
+import io
 import json
 import os
 import sys
@@ -363,6 +364,85 @@ def build_summary_report(output_dir, brand_name):
     return summary_path, None
 
 
+def extract_bulk_sheet(filepath):
+    """Extract the Amazon Bulk Upload sheet from a tool output file.
+
+    Returns (sheet_name, rows_as_lists) or (None, None) if no bulk sheet found.
+    """
+    if not HAS_OPENPYXL:
+        return None, None
+    try:
+        wb = openpyxl.load_workbook(filepath, read_only=True, data_only=True)
+    except Exception:
+        return None, None
+    for name in wb.sheetnames:
+        if "Bulk Upload" in name:
+            ws = wb[name]
+            rows = [list(r) for r in ws.iter_rows(values_only=True)]
+            wb.close()
+            return name, rows
+    wb.close()
+    return None, None
+
+
+# Map file prefixes to friendly tab names for the combined bulk upload file
+_BULK_TAB_NAMES = {
+    "3": "Bid_Changes",
+    "4": "Budget_Changes",
+    "6": "New_SKCs",
+}
+
+
+def build_bulk_upload_bytes(rows, sheet_name="Bulk Upload"):
+    """Create a single-sheet .xlsx in memory from a list of rows. Returns bytes."""
+    wb = openpyxl.Workbook()
+    ws = wb.active
+    ws.title = sheet_name
+    for row in rows:
+        ws.append(row)
+    buf = io.BytesIO()
+    wb.save(buf)
+    buf.seek(0)
+    return buf.getvalue()
+
+
+def build_combined_bulk_upload(output_dir):
+    """Merge all bulk upload sheets from output files into one workbook.
+
+    Returns (bytes, tab_count) or (None, 0) if no bulk sheets found.
+    """
+    if not HAS_OPENPYXL:
+        return None, 0
+
+    xlsx_files = sorted([
+        f for f in os.listdir(output_dir)
+        if f.endswith(".xlsx") and not f.startswith("0_Summary")
+    ])
+
+    wb = openpyxl.Workbook()
+    wb.remove(wb.active)  # remove default empty sheet
+    tab_count = 0
+
+    for xlsx_name in xlsx_files:
+        filepath = os.path.join(output_dir, xlsx_name)
+        prefix_num = xlsx_name.split("_")[0]  # e.g. "3", "4", "6"
+        sheet_label = _BULK_TAB_NAMES.get(prefix_num, f"Tool_{prefix_num}")
+        _, rows = extract_bulk_sheet(filepath)
+        if rows and len(rows) > 1:  # has header + at least one data row
+            ws = wb.create_sheet(title=sheet_label[:31])
+            for row in rows:
+                ws.append(row)
+            tab_count += 1
+
+    if tab_count == 0:
+        return None, 0
+
+    buf = io.BytesIO()
+    wb.save(buf)
+    buf.seek(0)
+    return buf.getvalue(), tab_count
+
+
 # ── Page: Brand Management ───────────────────────────────────────────────────
 
 def page_brands():
@@ -618,16 +698,50 @@ def page_run():
     if os.path.exists(output_dir):
         xlsx_files = sorted([f for f in os.listdir(output_dir) if f.endswith(".xlsx")])
         if xlsx_files:
+            # ── Combined Bulk Upload button at the top ──
+            combined_data, tab_count = build_combined_bulk_upload(output_dir)
+            if combined_data and tab_count > 0:
+                st.download_button(
+                    label=f"⬆ Combined Bulk Upload — All Changes ({tab_count} tabs)",
+                    data=combined_data,
+                    file_name=f"Bulk_Upload_All_Changes_{date.today().isoformat()}.xlsx",
+                    mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                    key=f"dl_combined_bulk_{brand_name}",
+                )
+                st.caption("One file with all bid changes, budget changes, and new SKCs — ready for Seller Central.")
+                st.divider()
+
+            # ── Individual file downloads ──
             for f in xlsx_files:
                 filepath = os.path.join(output_dir, f)
-                with open(filepath, "rb") as fh:
-                    st.download_button(
-                        label=f"{f}",
-                        data=fh.read(),
-                        file_name=f,
-                        mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-                        key=f"dl_{f}_{brand_name}",
-                    )
+                _, bulk_rows = extract_bulk_sheet(filepath)
+                has_bulk = bulk_rows is not None and len(bulk_rows) > 1
+
+                if has_bulk:
+                    col_full, col_bulk = st.columns([3, 2])
+                else:
+                    col_full, col_bulk = st.columns([3, 2])
+
+                with col_full:
+                    with open(filepath, "rb") as fh:
+                        st.download_button(
+                            label=f"📊 {f}",
+                            data=fh.read(),
+                            file_name=f,
+                            mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                            key=f"dl_{f}_{brand_name}",
+                        )
+                with col_bulk:
+                    if has_bulk:
+                        bulk_bytes = build_bulk_upload_bytes(bulk_rows)
+                        bulk_fname = f.replace(".xlsx", "_BULK_UPLOAD.xlsx")
+                        st.download_button(
+                            label=f"⬆ Bulk Upload",
+                            data=bulk_bytes,
+                            file_name=bulk_fname,
+                            mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                            key=f"dlbulk_{f}_{brand_name}",
+                        )
         else:
             st.info("No output files yet. Run the analysis first.")
     else:
