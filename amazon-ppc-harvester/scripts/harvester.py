@@ -767,19 +767,19 @@ def build_bulk_upload_sheet(wb, df):
     """
     Produces an Amazon Sponsored Products bulk upload-compatible sheet.
     Rows: Keyword (harvest) + Negative keyword rows.
-    User must fill in Campaign ID / Ad Group ID before uploading.
+    User must fill in Campaign Id / Ad Group Id before uploading.
     """
     ws = wb.create_sheet("📤 Amazon Bulk Upload")
     ws.sheet_view.showGridLines = False
 
     title = "Amazon Bulk Upload — Keyword & Negative Keyword Rows"
-    subtitle = ("⚠ Fill in Campaign ID and Ad Group ID before uploading to Seller Central → Campaign Manager → Bulk Operations")
+    subtitle = ("⚠ Fill in Campaign Id and Ad Group Id before uploading to Seller Central → Campaign Manager → Bulk Operations")
     add_sheet_title(ws, title, subtitle, C["header_dark"])
 
     # Amazon bulk operations columns (standard SP format)
     headers = [
-        "Product", "Entity", "Operation", "Campaign ID", "Ad Group ID",
-        "Portfolio ID", "Ad ID", "Keyword ID", "Campaign Name",
+        "Product", "Entity", "Operation", "Campaign Id", "Ad Group Id",
+        "Portfolio Id", "Ad Id", "Keyword Id", "Campaign Name",
         "Ad Group Name", "Start Date", "End Date", "Targeting Type",
         "State", "Daily Budget", "SKU", "ASIN", "Ad Group Default Bid",
         "Bid", "Keyword Text", "Match Type", "Bidding Strategy",
@@ -800,10 +800,10 @@ def build_bulk_upload_sheet(wb, df):
             "Product": "Sponsored Products",
             "Entity": "Keyword",
             "Operation": "create",
-            "Campaign ID": "⬅ FILL IN",
-            "Ad Group ID": "⬅ FILL IN",
-            "Portfolio ID": "",
-            "Ad ID": "", "Keyword ID": "",
+            "Campaign Id": "⬅ FILL IN",
+            "Ad Group Id": "⬅ FILL IN",
+            "Portfolio Id": "",
+            "Ad Id": "", "Keyword Id": "",
             "Campaign Name": row.get("campaign", ""),
             "Ad Group Name": row.get("ad_group", ""),
             "Start Date": "", "End Date": "",
@@ -836,10 +836,10 @@ def build_bulk_upload_sheet(wb, df):
             "Product": "Sponsored Products",
             "Entity": "Negative keyword",
             "Operation": "create",
-            "Campaign ID": "⬅ FILL IN",
-            "Ad Group ID": "⬅ FILL IN",
-            "Portfolio ID": "",
-            "Ad ID": "", "Keyword ID": "",
+            "Campaign Id": "⬅ FILL IN",
+            "Ad Group Id": "⬅ FILL IN",
+            "Portfolio Id": "",
+            "Ad Id": "", "Keyword Id": "",
             "Campaign Name": row.get("campaign", ""),
             "Ad Group Name": row.get("ad_group", ""),
             "Start Date": "", "End Date": "",
@@ -871,9 +871,9 @@ def build_bulk_upload_sheet(wb, df):
     # Warning note
     ws.row_dimensions[excel_row + 1].height = 20
     note = ws.cell(row=excel_row + 1, column=1,
-                   value="⚠ ACTION REQUIRED: Fill in Campaign ID and Ad Group ID "
+                   value="⚠ ACTION REQUIRED: Fill in Campaign Id and Ad Group Id "
                          "columns before uploading. Get these IDs from Campaign Manager → "
-                         "Columns → Campaign ID / Ad Group ID.")
+                         "Columns → Campaign Id / Ad Group Id.")
     note.font = Font(name=FONT, bold=True, size=9, color=C["negative"])
     note.fill = hex_fill("FFF0F0")
     ws.merge_cells(

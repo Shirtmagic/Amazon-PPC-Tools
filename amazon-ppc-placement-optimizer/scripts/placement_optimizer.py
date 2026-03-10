@@ -595,7 +595,7 @@ def build_bulk_upload(wb, df, camps):
 
     headers = [
         "Product", "Entity", "Operation",
-        "Campaign ID", "Campaign Name",
+        "Campaign Id", "Campaign Name",
         "Bidding Strategy", "Placement",
         "Current Modifier %", "New Modifier %", "Delta",
         "Action", "Reason"
@@ -647,7 +647,7 @@ def build_bulk_upload(wb, df, camps):
             "Product":           "Sponsored Products",
             "Entity":            "Bidding Adjustment",
             "Operation":         "update",
-            "Campaign ID":       cid,
+            "Campaign Id":       cid,
             "Campaign Name":     cname,
             "Bidding Strategy":  strat,
             "Placement":         row.get("Placement", ""),

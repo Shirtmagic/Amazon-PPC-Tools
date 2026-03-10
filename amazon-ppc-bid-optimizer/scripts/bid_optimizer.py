@@ -545,7 +545,7 @@ def build_bulk_upload(wb, df):
     # Minimal set of columns Amazon needs for a keyword bid update
     headers = [
         "Product", "Entity", "Operation",
-        "Campaign ID", "Ad Group ID", "Keyword ID",
+        "Campaign Id", "Ad Group Id", "Keyword Id",
         "Campaign Name", "Ad Group Name",
         "State", "Bid", "Keyword Text", "Match Type",
         "Previous Bid", "Bid Change %", "Action Tag"
@@ -576,9 +576,9 @@ def build_bulk_upload(wb, df):
             "Product":      "Sponsored Products",
             "Entity":       "Keyword",
             "Operation":    "update",
-            "Campaign ID":  row.get("Campaign ID", ""),
-            "Ad Group ID":  row.get("Ad Group ID", ""),
-            "Keyword ID":   row.get("Keyword ID", ""),
+            "Campaign Id":  row.get("Campaign ID", ""),
+            "Ad Group Id":  row.get("Ad Group ID", ""),
+            "Keyword Id":   row.get("Keyword ID", ""),
             "Campaign Name":  row.get("Campaign Name", ""),
             "Ad Group Name":  row.get("Ad Group Name", ""),
             "State":        state_val,

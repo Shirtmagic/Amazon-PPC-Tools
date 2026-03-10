@@ -519,7 +519,7 @@ def build_bulk_upload(wb, df):
         "⚠ Upload via Seller Central → Campaign Manager → Bulk Operations → Upload",
         C["header_dark"])
 
-    headers = ["Product", "Entity", "Operation", "Campaign ID",
+    headers = ["Product", "Entity", "Operation", "Campaign Id",
                "Campaign Name", "State", "Daily Budget",
                "Previous Budget", "Budget Change $", "Budget Change %", "Action Tag"]
     apply_header(ws, 3, headers, C["header_dark"])
@@ -537,7 +537,7 @@ def build_bulk_upload(wb, df):
             "Product":          "Sponsored Products",
             "Entity":           "Campaign",
             "Operation":        "update",
-            "Campaign ID":      row.get("Campaign ID", ""),
+            "Campaign Id":      row.get("Campaign ID", ""),
             "Campaign Name":    row.get("Campaign Name", ""),
             "State":            row.get("State", "enabled"),
             "Daily Budget":     round(float(row.get("new_budget", 0)), 2),

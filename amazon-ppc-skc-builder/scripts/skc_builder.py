@@ -282,11 +282,11 @@ def build_campaigns(df, asin, portfolio, goal, target_acos, starting_bid,
 # -- Bulk Upload Row Generation -----------------------------------------------
 
 BULK_HEADERS = [
-    "Product", "Entity", "Operation", "Campaign ID", "Ad Group ID",
-    "Portfolio ID", "Campaign Name", "Ad Group Name", "Portfolio Name",
+    "Product", "Entity", "Operation", "Campaign Id", "Ad Group Id",
+    "Portfolio Id", "Campaign Name", "Ad Group Name", "Portfolio Name",
     "Start Date", "End Date", "Targeting Type", "State", "Daily Budget",
-    "Keyword Text", "Match Type", "Bid", "Keyword ID",
-    "Product Targeting ID", "Bidding Strategy",
+    "Keyword Text", "Match Type", "Bid", "Keyword Id",
+    "Product Targeting Id", "Bidding Strategy",
     "Placement Product Page", "Placement Top", "ASIN", "SKU",
 ]
 
