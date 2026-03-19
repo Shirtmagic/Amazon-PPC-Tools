@@ -298,7 +298,7 @@ def run_tool(tool, brand, defaults, files, output_dir):
     args = tool["build"](brand, defaults, files, output_dir, output_file)
     cmd = [sys.executable, script_path] + args
     result = subprocess.run(
-        cmd, capture_output=True, text=True, timeout=300, cwd=APP_DIR
+        cmd, capture_output=True, text=True, timeout=900, cwd=APP_DIR
     )
     return result, output_file
 
@@ -622,7 +622,7 @@ def page_run():
                             )
                             break
                     except subprocess.TimeoutExpired:
-                        st.error(f"**{tool['name']}** timed out (5 min limit)")
+                        st.error(f"**{tool['name']}** timed out (15 min limit)")
                         status.update(
                             label=f"Timeout at {tool['name']}",
                             state="error"
